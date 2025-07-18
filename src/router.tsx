@@ -5,6 +5,7 @@ import { PageRoute } from './types/components'
 import JobsPage from './pages/JobsPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
+import DriversPage from './pages/DriversPage'
 
 export const router = createBrowserRouter([
   {
@@ -36,7 +37,7 @@ export const router = createBrowserRouter([
           },
           {
             path: PageRoute.Drivers,
-            element: <h1>DRIVERS</h1>,
+            Component: DriversPage,
           },
         ],
       },
