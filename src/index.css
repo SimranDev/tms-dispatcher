@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @plugin "daisyui" {
   themes: corporate --default;
+  /* rootscrollgutter excluded to avoid layout shift, e.g. when you open a daisyui drawer*/
+  exclude: rootscrollgutter;
 }
 
 :root {
