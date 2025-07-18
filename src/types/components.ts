@@ -13,19 +13,21 @@ export interface NavItem {
   icon: React.ReactElement
 }
 
-export const Status = {
-  Active: 'Active',
-  Inactive: 'Inactive',
-  OnLeave: 'On Leave',
+export const JobStatus = {
+  Booked: 'BOOKED',
+  InProgress: 'IN_PROGRESS',
+  Completed: 'COMPLETED',
+  Cancelled: 'CANCELLED',
+  Pending: 'PENDING',
 } as const
 
-export type Status = (typeof Status)[keyof typeof Status]
+export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus]
 
-export interface Person {
-  id: number
-  firstName: string
-  lastName: string
-  email: string
-  age: number
-  status: Status
+export interface Job {
+  id?: string
+  name: string
+  origin: string
+  destination: string
+  status: JobStatus
+  notes?: string
 }

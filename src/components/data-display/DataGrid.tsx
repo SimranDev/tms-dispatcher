@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, type InputHTMLAttributes, type ReactNode } from 'react'
 import { Icon } from '@iconify/react'
 import {
   useReactTable,
@@ -9,50 +9,47 @@ import {
   flexRender,
   createColumnHelper,
   type SortingState,
-  type ColumnDef,
 } from '@tanstack/react-table'
-import { Status, type Person } from '../../types/components'
+import { JobStatus, type Job } from '../../types/components'
 
-interface DataGridProps<TData> {
-  data: TData[]
+interface DataGridProps {
+  data: Job[]
+  drawer: ReactNode
 }
 
-const columnHelper = createColumnHelper<Person>()
+const columnHelper = createColumnHelper<Job>()
 
-const columns: ColumnDef<Person, any>[] = [
-  columnHelper.accessor('id', {
-    header: 'ID',
+const columns = [
+  columnHelper.accessor('name', {
+    header: 'Name',
     cell: (info) => info.getValue(),
     size: 50,
   }),
-  columnHelper.accessor((row) => `${row.firstName} ${row.lastName}`, {
-    id: 'fullName',
-    header: 'Full Name',
-    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+  columnHelper.accessor('origin', {
+    header: 'Origin',
+    cell: (info) => info.getValue(),
   }),
-  columnHelper.accessor('email', {
-    header: 'Email',
-    cell: (info) => (
-      <a href={`mailto:${info.getValue()}`} className="link link-hover">
-        {info.getValue()}
-      </a>
-    ),
-  }),
-  columnHelper.accessor('age', {
-    header: 'Age',
+  columnHelper.accessor('destination', {
+    header: 'Destination',
     cell: (info) => info.getValue(),
   }),
   columnHelper.accessor('status', {
     header: 'Status',
     cell: (info) => {
-      const status = info.getValue() as Status
+      const status = info.getValue() as JobStatus
       const badgeClass = {
-        [Status.Active]: 'badge-success',
-        [Status.Inactive]: 'badge-error',
-        [Status.OnLeave]: 'badge-warning',
+        [JobStatus.Booked]: 'badge-info',
+        [JobStatus.InProgress]: 'badge-warning',
+        [JobStatus.Completed]: 'badge-success',
+        [JobStatus.Cancelled]: 'badge-error',
       }[status]
       return <span className={`badge ${badgeClass} badge-ghost`}>{status}</span>
     },
+  }),
+  columnHelper.accessor('notes', {
+    header: 'Notes',
+    cell: (info) => info.getValue() || 'N/A',
+    size: 150,
   }),
 ]
 
@@ -62,15 +59,15 @@ const DebouncedInput: React.FC<
     value: string | number
     onChange: (value: string | number) => void
     debounce?: number
-  } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>
+  } & Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'>
 > = ({ value: initialValue, onChange, debounce = 500, ...props }) => {
   const [value, setValue] = useState(initialValue)
 
-  React.useEffect(() => {
+  useEffect(() => {
     setValue(initialValue)
   }, [initialValue])
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timeout = setTimeout(() => {
       onChange(value)
     }, debounce)
@@ -82,14 +79,14 @@ const DebouncedInput: React.FC<
   return <input {...props} value={value} onChange={(e) => setValue(e.target.value)} />
 }
 
-export function DataGrid<TData>({ data }: DataGridProps<TData>) {
+export const DataGrid = ({ data, drawer }: DataGridProps) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
 
   const memoizedData = useMemo(() => data, [data])
 
   const table = useReactTable({
-    data: memoizedData as Person[], // Cast needed for useReactTable
+    data: memoizedData as Job[], // Cast needed for useReactTable
     columns,
     state: {
       sorting,
@@ -113,6 +110,7 @@ export function DataGrid<TData>({ data }: DataGridProps<TData>) {
           className="input input-bordered w-full max-w-xs"
           placeholder="Search all columns..."
         />
+        {drawer}
       </div>
       <div className="overflow-x-auto">
         <table className="table-zebra table w-full">
@@ -120,7 +118,7 @@ export function DataGrid<TData>({ data }: DataGridProps<TData>) {
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}>
+                  <th key={header.id} style={{ width: header.getSize() !== 200 ? header.getSize() : undefined }}>
                     {header.isPlaceholder ? null : (
                       <div
                         {...{
@@ -198,3 +196,5 @@ export function DataGrid<TData>({ data }: DataGridProps<TData>) {
     </div>
   )
 }
+
+export default DataGrid

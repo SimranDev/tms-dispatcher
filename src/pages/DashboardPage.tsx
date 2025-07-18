@@ -1,5 +1,11 @@
+import AddressAutocomplete from '../components/form/AddressAutocomplete'
+
 const DashboardPage = () => {
-  return <div>DashboardPage</div>
+  return (
+    <div>
+      <AddressAutocomplete />
+    </div>
+  )
 }
 
 export default DashboardPage
