@@ -5,6 +5,10 @@
   exclude: rootscrollgutter;
 }
 
+@utility table-zebra {
+  @apply table w-full [&_tr:nth-child(even)]:bg-neutral-100;
+}
+
 :root {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
