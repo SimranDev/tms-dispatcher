@@ -1,22 +1,33 @@
 import { DataGrid } from '../components/data-display/DataGrid'
-import CreateJobDrawer from '../components/drawer/CreateJobDrawer'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { jobsAPI } from '../api'
+import type { Job } from '../types/dto'
+import { useShallow } from 'zustand/shallow'
+import { useGStore } from '../store/gStore'
+import CreateJobDrawer from '../components/drawer/CreateJobDrawer'
+import { jobColumns } from '../lib/datagrid-columns/jobColumns'
 
 const JobsPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  // const [jobs] = useGStore(useShallow((s) => [s.jobs, s.addJob]))
+
+  const [jobs, setJobs] = useGStore(useShallow((s) => [s.jobs, s.setJobs]))
+
   const { data } = useQuery({
     queryKey: ['jobs'],
     queryFn: jobsAPI.getJobs,
     initialData: [],
   })
 
+  useEffect(() => {
+    if (data) setJobs(data)
+  }, [data, setJobs])
+
   return (
     <div>
-      <DataGrid
-        data={data}
+      <DataGrid<Job>
+        data={jobs}
+        columns={jobColumns}
         drawer={
           <button className="btn btn-primary" onClick={() => setIsDrawerOpen(true)}>
             Create Job
