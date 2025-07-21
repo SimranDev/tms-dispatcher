@@ -1,36 +1,51 @@
 import React, { useState, type FormEvent } from 'react'
 import { Icon } from '@iconify/react'
-import { JobStatus, type Job } from '../../types/components'
 import { useMutation } from '@tanstack/react-query'
 import { jobsAPI } from '../../api'
 import AddressAutocomplete from '../form/AddressAutocomplete'
+import type { CreateJob } from '../../types/dto'
+import { JobStatus } from '../../types/dto/enums'
+import { useGStore } from '../../store/gStore'
+import { useShallow } from 'zustand/shallow'
 
 interface CreateJobDrawerProps {
   isOpen: boolean
   onClose: () => void
 }
 
-const emptyJob: Job = {
-  name: '',
-  origin: '',
-  destination: '',
+const emptyJob: CreateJob = {
+  customerId: '',
+  containerId: '',
+  vehicleId: '',
+  driverId: '',
+  pickupAddress: '',
+  deliveryAddress: '',
+  scheduledPickup: new Date().toISOString(),
+  scheduledDelivery: new Date().toISOString(),
   status: JobStatus.Booked,
   notes: '',
+  freightDescription: '',
 }
 
 const CreateJobDrawer: React.FC<CreateJobDrawerProps> = ({ isOpen, onClose }) => {
-  const [job, setJob] = useState<Job>(emptyJob)
+  const [job, setJob] = useState<CreateJob>(emptyJob)
+
+  const [customers, containers, vehicles, drivers, jobs, setJobs] = useGStore(
+    useShallow((s) => [s.customers, s.containers, s.vehicles, s.drivers, s.jobs, s.setJobs])
+  )
 
   const { mutate } = useMutation({
     mutationFn: jobsAPI.createJob,
-    onSuccess: () => {
+    onSuccess: (res) => {
       setJob(emptyJob)
+      setJobs([res, ...jobs])
       onClose()
     },
   })
 
-  const handleSubmit = (e: FormEvent, data: Job) => {
+  const handleSubmit = (e: FormEvent, data: CreateJob) => {
     e.preventDefault()
+
     mutate(data)
   }
 
@@ -48,7 +63,7 @@ const CreateJobDrawer: React.FC<CreateJobDrawerProps> = ({ isOpen, onClose }) =>
         role="dialog"
         aria-modal="true"
         aria-labelledby="drawer-title"
-        className={`bg-base-100 fixed top-0 right-0 z-50 h-full w-full max-w-md transform shadow-xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`bg-base-100 fixed top-0 right-0 z-50 h-full w-full max-w-xl transform shadow-xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex h-full flex-col">
           <header className="border-base-300 flex flex-shrink-0 items-center justify-between border-b p-4">
@@ -62,34 +77,134 @@ const CreateJobDrawer: React.FC<CreateJobDrawerProps> = ({ isOpen, onClose }) =>
 
           <form id={formId} onSubmit={(e) => handleSubmit(e, job)} className="flex-grow overflow-y-auto p-6">
             <div className="space-y-4">
-              <div className="form-control">
-                <label className="label" htmlFor="customer-input">
-                  <span className="label-text">Job Name</span>
-                </label>
-                <input
-                  id="customer-input"
-                  type="text"
-                  placeholder="Enter Name"
-                  className="input input-bordered w-full"
-                  value={job.name}
-                  onChange={(e) => setJob({ ...job, name: e.target.value })}
-                  required
-                />
+              <div className="flex gap-4">
+                <div className="form-control">
+                  <label className="label" htmlFor="customer-select">
+                    <span className="label-text">Select Customer</span>
+                  </label>
+                  <select
+                    id="customer-select"
+                    className="select select-bordered w-full"
+                    value={job.customerId}
+                    onChange={(e) => setJob({ ...job, customerId: e.target.value })}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select a customer
+                    </option>
+                    {customers.map((customer) => (
+                      <option key={customer.id} value={customer.id}>
+                        {customer.companyName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-control">
+                  <label className="label" htmlFor="container-select">
+                    <span className="label-text">Select Container</span>
+                  </label>
+                  <select
+                    id="container-select"
+                    className="select select-bordered w-full"
+                    value={job.containerId}
+                    onChange={(e) => setJob({ ...job, containerId: e.target.value })}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select a container
+                    </option>
+                    {containers.map((container) => (
+                      <option key={container.id} value={container.id}>
+                        {container.containerNumber}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-
+              <div className="flex gap-4">
+                <div className="form-control">
+                  <label className="label" htmlFor="vehicle-select">
+                    <span className="label-text">Select Vehicle</span>
+                  </label>
+                  <select
+                    id="vehicle-select"
+                    className="select select-bordered w-full"
+                    value={job.vehicleId}
+                    onChange={(e) => setJob({ ...job, vehicleId: e.target.value })}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select a vehicle
+                    </option>
+                    {vehicles.map((vehicle) => (
+                      <option key={vehicle.id} value={vehicle.id}>
+                        {vehicle.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-control">
+                  <label className="label" htmlFor="driver-select">
+                    <span className="label-text">Select Driver</span>
+                  </label>
+                  <select
+                    id="driver-select"
+                    className="select select-bordered w-full"
+                    value={job.driverId}
+                    onChange={(e) => setJob({ ...job, driverId: e.target.value })}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select a driver
+                    </option>
+                    {drivers.map((driver) => (
+                      <option key={driver.id} value={driver.id}>
+                        {driver.firstname} {driver.lastname}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="form-control">
+                  <label className="label" htmlFor="scheduled-pickup">
+                    <span className="label-text">Scheduled Pickup</span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="scheduled-pickup"
+                    className="input input-bordered w-full"
+                    value={job.scheduledPickup.slice(0, 16)}
+                    onChange={(e) => setJob({ ...job, scheduledPickup: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label" htmlFor="scheduled-delivery">
+                    <span className="label-text">Scheduled Delivery</span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="scheduled-delivery"
+                    className="input input-bordered w-full"
+                    value={job.scheduledDelivery.slice(0, 16)}
+                    onChange={(e) => setJob({ ...job, scheduledDelivery: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
               <AddressAutocomplete
-                label="Origin"
-                placeholder="Enter origin address"
+                label="Pickup Address"
+                placeholder="Enter pickup address"
                 initialValue=""
-                onSelect={(value) => setJob({ ...job, origin: value })}
+                onSelect={(value) => setJob({ ...job, pickupAddress: value })}
               />
               <AddressAutocomplete
-                label="Destination"
-                placeholder="Enter destination address"
+                label="Delivery Address"
+                placeholder="Enter delivery address"
                 initialValue=""
-                onSelect={(value) => setJob({ ...job, destination: value })}
+                onSelect={(value) => setJob({ ...job, deliveryAddress: value })}
               />
-
               <div className="form-control grid">
                 <label className="label" htmlFor="status-select">
                   <span className="label-text">Status</span>
@@ -108,17 +223,17 @@ const CreateJobDrawer: React.FC<CreateJobDrawerProps> = ({ isOpen, onClose }) =>
                   ))}
                 </select>
               </div>
-
               <div className="form-control">
-                <label className="label" htmlFor="notes-input">
-                  <span className="label-text">Notes</span>
+                <label className="label" htmlFor="freight-description-input">
+                  <span className="label-text">Freight Description</span>
                 </label>
                 <textarea
-                  id="notes-input"
+                  id="freight-description-input"
                   className="textarea textarea-bordered w-full"
-                  placeholder="Additional notes"
-                  value={job.notes}
-                  onChange={(e) => setJob({ ...job, notes: e.target.value })}
+                  placeholder="Additional details about the freight"
+                  value={job.freightDescription}
+                  onChange={(e) => setJob({ ...job, freightDescription: e.target.value })}
+                  required
                 />
               </div>
             </div>
