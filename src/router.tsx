@@ -6,6 +6,9 @@ import JobsPage from './pages/JobsPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import DriversPage from './pages/DriversPage'
+import VehiclesPage from './pages/VehiclesPage'
+import CustomersPage from './pages/CustomersPage'
+import ContainersPage from './pages/ContainersPage'
 
 export const router = createBrowserRouter([
   {
@@ -33,11 +36,19 @@ export const router = createBrowserRouter([
           },
           {
             path: PageRoute.Vehicles,
-            element: <h1>VEHICLES</h1>,
+            Component: VehiclesPage,
           },
           {
             path: PageRoute.Drivers,
             Component: DriversPage,
+          },
+          {
+            path: PageRoute.Customers,
+            Component: CustomersPage,
+          },
+          {
+            path: PageRoute.Containers,
+            Component: ContainersPage,
           },
         ],
       },

@@ -143,7 +143,7 @@ const AddressAutocomplete = ({
   }
 
   return (
-    <div className={`mx-auto w-full max-w-lg ${className}`}>
+    <div className={`w-full max-w-lg ${className}`}>
       <div className="relative">
         <label htmlFor="address-input" className="label mb-0.5">
           <span className="label-text">

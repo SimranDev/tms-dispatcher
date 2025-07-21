@@ -1,32 +1,30 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-
-interface User {
-  username: string
-}
+import type { User } from '../types/dto'
+import type { LoginResponse } from '../types/api'
 
 interface AuthState {
   user: User | null
-  login: (user: User) => void
-  logout: () => void
+  setUser: (res: LoginResponse) => void
+  logout: VoidFunction
 }
 
 // Using persist middleware to automatically save and retrieve auth state from localStorage.
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      login: (user) => set({ user }),
-      logout: () => set({ user: null }),
-    }),
-    {
-      name: 'auth-storage', // unique name for localStorage item
-    }
-  )
-)
+export const useAuthStore = create<AuthState>()((set) => ({
+  user: JSON.parse(localStorage.getItem('user') || 'null'),
+  setUser: (res) => {
+    set({ user: res.user })
+    localStorage.setItem('accessToken', res.accessToken)
+    localStorage.setItem('user', JSON.stringify(res.user))
+  },
+  logout: () => {
+    set({ user: null })
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('user')
+    window.location.href = '/login'
+  },
+}))
 
-/**
- * A custom hook selector to easily check if the user is authenticated.
- * This prevents unnecessary re-renders in components that only need the auth status.
- */
-export const useIsAuthenticated = () => useAuthStore((state) => !!state.user)
+export const useIsAuthenticated = () => {
+  const accessToken = localStorage.getItem('accessToken')
+  return !!accessToken
+}

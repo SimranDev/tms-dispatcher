@@ -1,28 +1,36 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuthStore } from '../store/authStore'
+import axios from 'axios'
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
-  const login = useAuthStore((state) => state.login)
+  const setUser = useAuthStore((state) => state.setUser)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!username.trim() || !password.trim()) {
-      setError('Please enter both username and password.')
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both email and password.')
       return
     }
     setError('')
 
-    // In a real app, you'd validate the password against a server.
-    // Here, we just log the user in by updating the Zustand store.
-    login({ username })
-
-    // Navigate to the home page upon successful login.
-    navigate('/', { replace: true })
+    axios
+      .post(import.meta.env.VITE_API_BASE_URL + '/user-auth/login', { email, password })
+      .then((res) => {
+        if (res.status === 200) {
+          setUser(res.data)
+          navigate('/', { replace: true })
+        }
+      })
+      .catch((err) => {
+        console.error('Login error:', err)
+        setError('Login failed. Please try again later.')
+        localStorage.removeItem('accessToken')
+      })
   }
 
   return (
@@ -35,14 +43,14 @@ const LoginPage = () => {
               <span className="label-text">Username</span>
             </label>
             <input
-              id="username"
-              type="text"
-              placeholder="e.g., jane.doe"
+              id="email"
+              type="email"
+              placeholder="e.g., jane.doe@example.com"
               className="input input-bordered"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="username"
+              autoComplete="email"
             />
           </div>
           <div className="form-control">

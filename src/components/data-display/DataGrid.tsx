@@ -7,51 +7,16 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   flexRender,
-  createColumnHelper,
   type SortingState,
+  type ColumnDef,
 } from '@tanstack/react-table'
-import { JobStatus, type Job } from '../../types/components'
 
-interface DataGridProps {
-  data: Job[]
-  drawer: ReactNode
+interface DataGridProps<T = Record<string, unknown>> {
+  data: T[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<T, any>[]
+  drawer?: ReactNode
 }
-
-const columnHelper = createColumnHelper<Job>()
-
-const columns = [
-  columnHelper.accessor('name', {
-    header: 'Name',
-    cell: (info) => info.getValue(),
-    size: 50,
-  }),
-  columnHelper.accessor('origin', {
-    header: 'Origin',
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor('destination', {
-    header: 'Destination',
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor('status', {
-    header: 'Status',
-    cell: (info) => {
-      const status = info.getValue() as JobStatus
-      const badgeClass = {
-        [JobStatus.Booked]: 'badge-info',
-        [JobStatus.InProgress]: 'badge-warning',
-        [JobStatus.Completed]: 'badge-success',
-        [JobStatus.Cancelled]: 'badge-error',
-      }[status]
-      return <span className={`badge ${badgeClass} badge-ghost`}>{status}</span>
-    },
-  }),
-  columnHelper.accessor('notes', {
-    header: 'Notes',
-    cell: (info) => info.getValue() || 'N/A',
-    size: 150,
-  }),
-]
 
 // A debounced input react component
 const DebouncedInput: React.FC<
@@ -79,14 +44,14 @@ const DebouncedInput: React.FC<
   return <input {...props} value={value} onChange={(e) => setValue(e.target.value)} />
 }
 
-export const DataGrid = ({ data, drawer }: DataGridProps) => {
+export const DataGrid = <T,>({ data, columns, drawer }: DataGridProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
 
   const memoizedData = useMemo(() => data, [data])
 
   const table = useReactTable({
-    data: memoizedData as Job[], // Cast needed for useReactTable
+    data: memoizedData,
     columns,
     state: {
       sorting,
