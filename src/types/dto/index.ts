@@ -60,7 +60,11 @@ export interface Job {
   vehicleId: string
   status: JobStatus
   pickupAddress: string
+  pickupLatitude: number
+  pickupLongitude: number
   deliveryAddress: string
+  deliveryLatitude: number
+  deliveryLongitude: number
   scheduledPickup: string
   scheduledDelivery: string
   actualPickup?: string
