@@ -3,6 +3,7 @@ import { Icon } from '@iconify/react'
 
 export const NAV_ITEMS: NavItem[] = [
   { path: 'dashboard', label: 'Dashboard', icon: <Icon icon="material-symbols:dashboard-outline" width={20} /> },
+  { path: 'live-tracking', label: 'Live Tracking', icon: <Icon icon="mdi:map-marker-radius" width={22} /> },
   { path: 'jobs', label: 'Jobs', icon: <Icon icon="tdesign:task" width={20} /> },
   { path: 'vehicles', label: 'Vehicles', icon: <Icon icon="mdi:truck-outline" width={20} /> },
   { path: 'drivers', label: 'Drivers', icon: <Icon icon="mdi:user-outline" width={20} /> },

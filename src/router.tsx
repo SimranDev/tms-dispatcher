@@ -9,18 +9,20 @@ import DriversPage from './pages/DriversPage'
 import VehiclesPage from './pages/VehiclesPage'
 import CustomersPage from './pages/CustomersPage'
 import ContainersPage from './pages/ContainersPage'
+import LiveTrackingPage from './pages/LiverTrackingPage'
+import Playground from './pages/Playground'
 
 export const router = createBrowserRouter([
   {
     path: '/login',
-    Component: LoginPage,
+    Component: LoginPage
   },
   {
     Component: ProtectedRoute,
     children: [
       {
         path: '/',
-        element: <Navigate to={PageRoute.Dashboard} replace />,
+        element: <Navigate to={PageRoute.Dashboard} replace />
       },
       {
         Component: Layout,
@@ -28,30 +30,38 @@ export const router = createBrowserRouter([
           {
             index: true,
             path: PageRoute.Dashboard,
-            Component: DashboardPage,
+            Component: DashboardPage
+          },
+          {
+            path: PageRoute.LiveTracking,
+            Component: LiveTrackingPage
           },
           {
             path: PageRoute.Jobs,
-            Component: JobsPage,
+            Component: JobsPage
           },
           {
             path: PageRoute.Vehicles,
-            Component: VehiclesPage,
+            Component: VehiclesPage
           },
           {
             path: PageRoute.Drivers,
-            Component: DriversPage,
+            Component: DriversPage
           },
           {
             path: PageRoute.Customers,
-            Component: CustomersPage,
+            Component: CustomersPage
           },
           {
             path: PageRoute.Containers,
-            Component: ContainersPage,
+            Component: ContainersPage
           },
-        ],
-      },
-    ],
-  },
+          {
+            path: 'playground',
+            Component: Playground
+          }
+        ]
+      }
+    ]
+  }
 ])

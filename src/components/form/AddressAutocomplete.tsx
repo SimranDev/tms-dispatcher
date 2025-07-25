@@ -14,6 +14,10 @@ interface PlaceSuggestion {
 
 interface PlaceDetails {
   formattedAddress: string
+  location?: {
+    latitude: number
+    longitude: number
+  }
 }
 
 const API_KEY = import.meta.env.VITE_GOOGLE_PLACES_API_KEY
@@ -44,37 +48,40 @@ const AddressAutocomplete = ({
   const [activeIndex, setActiveIndex] = useState(-1)
   const debounceTimeout = useRef<number | null>(null)
 
-  const fetchSuggestions = async (text: string) => {
-    setActiveIndex(-1)
-    if (!text) {
-      setSuggestions([])
-      return
-    }
-    setLoading(true)
-    try {
-      const response = await axios.post(
-        PLACES_API_ENDPOINT,
-        {
-          input: text,
-          includedRegionCodes: regionCodes,
-        },
-        { headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': API_KEY } }
-      )
-      setSuggestions(response.data.suggestions || [])
-    } catch (error) {
-      console.error('Error fetching suggestions:', error)
-      setSuggestions([])
-    } finally {
-      setLoading(false)
-    }
-  }
+  const fetchSuggestions = useCallback(
+    async (text: string) => {
+      setActiveIndex(-1)
+      if (!text) {
+        setSuggestions([])
+        return
+      }
+      setLoading(true)
+      try {
+        const response = await axios.post(
+          PLACES_API_ENDPOINT,
+          {
+            input: text,
+            includedRegionCodes: regionCodes,
+          },
+          { headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': API_KEY } }
+        )
+        setSuggestions(response.data.suggestions || [])
+      } catch (error) {
+        console.error('Error fetching suggestions:', error)
+        setSuggestions([])
+      } finally {
+        setLoading(false)
+      }
+    },
+    [regionCodes]
+  )
 
   const debouncedFetchSuggestions = useCallback(
     (text: string) => {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
       debounceTimeout.current = setTimeout(() => fetchSuggestions(text), debounceMs)
     },
-    [debounceMs, regionCodes]
+    [debounceMs, fetchSuggestions]
   )
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -94,7 +101,7 @@ const AddressAutocomplete = ({
         headers: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': API_KEY,
-          'X-Goog-FieldMask': 'formattedAddress',
+          'X-Goog-FieldMask': 'formattedAddress,location',
         },
       })
       if (response.data.formattedAddress) {

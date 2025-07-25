@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'mapbox-gl/dist/mapbox-gl.css';
 @plugin "daisyui" {
   themes: corporate --default;
   /* rootscrollgutter excluded to avoid layout shift, e.g. when you open a daisyui drawer*/

@@ -25,7 +25,7 @@ const Sidebar = () => {
                   }`
                 }
               >
-                {item.icon}
+                <span className="w-7">{item.icon}</span>
                 <span className="ml-4 font-medium">{item.label}</span>
               </NavLink>
             </li>
