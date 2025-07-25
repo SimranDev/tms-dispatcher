@@ -5,6 +5,7 @@ export const PageRoute = {
   Drivers: 'drivers',
   Customers: 'customers',
   Containers: 'containers',
+  LiveTracking: 'live-tracking',
 } as const
 
 export type PageRoute = (typeof PageRoute)[keyof typeof PageRoute]
