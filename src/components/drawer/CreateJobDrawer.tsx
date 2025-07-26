@@ -24,7 +24,7 @@ const emptyJob: CreateJob = {
   scheduledDelivery: new Date().toISOString(),
   status: JobStatus.Booked,
   notes: '',
-  freightDescription: '',
+  freightDescription: ''
 }
 
 const CreateJobDrawer: React.FC<CreateJobDrawerProps> = ({ isOpen, onClose }) => {
@@ -40,7 +40,7 @@ const CreateJobDrawer: React.FC<CreateJobDrawerProps> = ({ isOpen, onClose }) =>
       setJob(emptyJob)
       setJobs([res, ...jobs])
       onClose()
-    },
+    }
   })
 
   const handleSubmit = (e: FormEvent, data: CreateJob) => {

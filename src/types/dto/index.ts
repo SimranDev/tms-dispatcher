@@ -1,5 +1,28 @@
 import type { ContainerSize, ContainerStatus, ContainerType, JobStatus, VehicleType } from './enums'
 
+export interface AddressData {
+  title: string
+  id: string
+  resultType?: string
+  houseNumberType?: string
+  address: {
+    label: string
+    countryCode?: string
+    countryName?: string
+    stateCode?: string
+    state?: string
+    city?: string
+    district?: string
+    street?: string
+    houseNumber?: string
+    postalCode?: string
+  }
+  position?: {
+    lat: number
+    lng: number
+  }
+}
+
 export interface User {
   id: string
   firstname: string
