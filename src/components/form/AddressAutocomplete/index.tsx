@@ -1,8 +1,8 @@
 import { useRef, type ChangeEvent, type KeyboardEvent } from 'react'
 import { useAddressAutocomplete } from '../../../hooks/useAddressAutocomplete'
-import { AddressInput } from '../AddressInput'
-import { AddressSuggestionsList } from '../AddressSuggestionsList'
 import type { AddressData } from '../../../types/dto'
+import { AddressInput } from './AddressInput'
+import { AddressSuggestionsList } from './AddressSuggestionsList'
 
 interface AddressAutocompleteProps {
   onSelect?: (address: string, details?: AddressData, originalSuggestion?: string) => void
